@@ -91,3 +91,77 @@ SELECT *
   FROM USER_VIEWS;
   
 DROP VIEW VM_EMP;
+
+-- 테이블, 데이터 사전, 인덱스, 뷰, 시퀀스, 동의어
+
+/* 데이터 사전 */
+-- 데이터 사전: 테이블 관련 메타 정보 저장되어 있음
+SELECT *
+  FROM DICT;	-- 사용 가능한 데이터 사전
+  
+SELECT TABLE_NAME
+  FROM USER_TABLES; 		-- 현재 접속 사용자(ADAM)이 가지고 있는 테이블 조회
+  
+SELECT OWNER, TABLE_NAME
+  FROM ALL_TABLES;			-- 현재 계정이 접속 가능한 모든 테이블 조회
+  
+SELECT *
+  FROM DBA_TABLES;			-- 관리 권한의 사용자만 접근 가능
+  
+/* 시퀀스 */
+CREATE TABLE DEPT_SEQ
+  AS SELECT *
+       FROM DEPT d
+      WHERE 1 <> 1;		-- <>: 부등호 / 빈테이블(컬럼만 같은) 만들어짐
+       
+SELECT *
+  FROM DEPT_SEQ;
+  
+DROP TABLE DEPT_SEQ;
+
+CREATE SEQUENCE SEQ_DEPT_SEQUENCE	-- 시퀀스 테이블 이름
+INCREMENT BY 10						-- 10씩 증가
+ START WITH 10						-- 시작값
+MAXVALUE 90							-- 최대값
+MINVALUE 0							-- 최소값
+NOCYCLE								-- 순환안함(최대값이면 정지)
+CACHE 2;							-- 2개의 CACHE 사용
+
+SELECT *
+  FROM USER_SEQUENCES;
+  
+ 
+-- 시퀀스 이름.NEXTVAL
+INSERT INTO DEPT_SEQ(DEPTNO, DNAME, LOC)
+VALUES (SEQ_DEPT_SEQUENCE.NEXTVAL, 'DATABASE', 'BUSAN');
+
+SELECT *
+  FROM DEPT_SEQ
+ ORDER BY DEPTNO;
+ 
+INSERT INTO DEPT_SEQ(DEPTNO, DNAME, LOC)
+VALUES (SEQ_DEPT_SEQUENCE.NEXTVAL, 'DATABASE1', 'SEOUL');
+
+SELECT *
+  FROM DEPT_SEQ
+ ORDER BY DEPTNO;
+ 
+INSERT INTO DEPT_SEQ(DEPTNO, DNAME, LOC)
+VALUES (SEQ_DEPT_SEQUENCE.NEXTVAL, 'DATABASE2', 'SEOUL');
+
+-- 시퀀스 이름.CURRVAL: 가장 마지막 시퀀스 확인
+SELECT SEQ_DEPT_SEQUENCE.CURRVAL
+  FROM DUAL;
+  
+-- 시퀀스 수정
+ALTER SEQUENCE SEQ_DEPT_SEQUENCE
+INCREMENT BY 3
+MAXVALUE 99
+CYCLE;
+
+SELECT *
+  FROM USER_SEQUENCES;
+  
+DROP SEQUENCE SEQ_DEPT_SEQUENCE;
+
+COMMIT;

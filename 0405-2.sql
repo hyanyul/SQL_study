@@ -276,18 +276,29 @@ SELECT *
 
 /* 문제 풀기 */
 -- 1. EMP 테이블에서 부서 인원이 4명보다 많은 부서의 부서 번호, 인원 수, 급여의 합 출력
-SELECT DEPTNO AS 부서번호, COUNT(EMPNO) AS "인원 수", SUM(SAL) AS "급여의 합"
+SELECT e.DEPTNO AS 부서번호, 
+	   COUNT(*) AS "인원 수", 	-- 전체 인원 출력 시 COUNT(*) 사용하면 됨
+	   SUM(e.SAL) AS "급여의 합"		
   FROM EMP e
- GROUP BY DEPTNO
-	   HAVING COUNT(EMPNO) > 4;
+ GROUP BY DEPTNO				-- 집계함수를 사용하기 위해 GROUP BY 사용 필요
+HAVING COUNT(EMPNO) > 4;
 
 -- 2. EMP 테이블에서 가장 많은 사원이 속해있는 부서번호와 사원 수 출력
-SELECT DEPTNO AS 부서번호, C AS "사원 수"
+SELECT DEPTNO AS 부서번호, 
+	   C AS "사원 수"
   FROM (SELECT DEPTNO, COUNT(EMPNO) AS C
   		  FROM EMP e
   		 GROUP BY DEPTNO
   	     ORDER BY COUNT(EMPNO) DESC)
  WHERE ROWNUM = 1;
+
+SELECT DEPTNO AS "부서번호",
+	   COUNT(*) AS "사원수"
+  FROM EMP e 
+ GROUP BY DEPTNO 
+HAVING COUNT(*) = (SELECT MAX(COUNT(*)) AS C
+  		  			 FROM EMP e
+  		 		    GROUP BY DEPTNO);
 
 -- 3. EMP 테이블에서 가장 많은 사원을 갖는 MGR의 사원번호 출력
 SELECT MGR AS "사원번호"
@@ -297,21 +308,38 @@ SELECT MGR AS "사원번호"
          ORDER BY COUNT(EMPNO) DESC)
  WHERE ROWNUM = 1
  
+SELECT MGR AS "사원번호"
+  FROM EMP e
+ GROUP BY MGR 
+HAVING COUNT(MGR) = (SELECT MAX(COUNT(*))
+					   FROM EMP e
+					  GROUP BY MGR);
+ 
 -- 4. EMP 테이블에서 부서번호가 10인 사원 수와 부서번호와 30인 사원 수를 각각 출력
-SELECT DEPTNO AS "부서번호", COUNT(EMPNO) AS "사원 수"
+SELECT DEPTNO AS "부서번호", 
+	   COUNT(EMPNO) AS "사원 수"
   FROM EMP e
  WHERE DEPTNO = 10
  GROUP BY DEPTNO
 UNION
-SELECT DEPTNO, COUNT(EMPNO) AS "사원 수"
+SELECT DEPTNO, 
+ 	   COUNT(EMPNO)
   FROM EMP e
  WHERE DEPTNO = 30
  GROUP BY DEPTNO
  
-SELECT DEPTNO, COUNT(EMPNO)
+SELECT DEPTNO AS "부서번호", 
+	   COUNT(EMPNO) AS "사원 수"
   FROM EMP e
  GROUP BY DEPTNO
 HAVING DEPTNO = 10 OR DEPTNO = 30
  ORDER BY DEPTNO;
+
+-- DECODE(조회열, 조건, 결과, 조건, 결과, .. , 디폴트 결과)
+-- COUTN() 안에 조건은 쓰지 못함. 함수는 사용 가능
+SELECT COUNT(DECODE(DEPTNO, 10, 1)) AS "부서번호 10 사원 수",
+	   COUNT(DECODE(DEPTNO, 30, 1)) AS "부서번호 30 사원 수"
+  FROM EMP e;
+
 
 COMMIT;

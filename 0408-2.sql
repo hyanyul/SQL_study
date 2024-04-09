@@ -139,7 +139,7 @@ SELECT EMPNO AS "사번",
   			   WHERE EMPNO = 7521) AND
   	   SAL > (SELECT SAL
   	   			FROM EMP e2
-  	   		   WHERE EMPNO = 7934)
+  	   		   WHERE EMPNO = 7934);
   	   
 -- 2. 직업별로 최소 급여를 받는 사원의 정보를 사원번호, 이름, 업무, 부서명으로 출력(직업별 내림차순)
 SELECT e.EMPNO AS "사원번호", 
@@ -151,6 +151,18 @@ SELECT e.EMPNO AS "사원번호",
 			    	    FROM EMP e1
 			   		   GROUP BY e1.JOB)	
  ORDER BY JOB DESC;
+
+SELECT e.EMPNO AS "사원번호", 
+	   e.ENAME AS "이름", 
+	   e.JOB AS "직무", 
+	   d.DNAME AS "부서명"
+  FROM EMP e, DEPT d
+ WHERE e.DEPTNO = d.DEPTNO 
+	   AND (e.JOB, e.SAL) IN (SELECT JOB, MIN(e1.SAL)
+	   					    	FROM EMP e1
+	   					   	   GROUP BY e1.JOB)
+ ORDER BY JOB DESC;
+	   				
  
 -- 3. 각 사원별 커미션이 0 또는 NULL이고, 부서 위치가 'GO'로 끝나는 사원의 사원번호, 사원이름, 커미션, 부서 번호,
 -- 부서명, 부서 위치 출력(보너스가 NULL이면 0으로 출력)
